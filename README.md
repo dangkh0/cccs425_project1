@@ -1,6 +1,6 @@
 # CCCS 425 Project 1
 ## General Information
-- Class: CCCS425 
+- Class: CCCS 425 - Web Services
 - Term: Fall 2020
 - Instructor: Jaques Le Normand
 - Email: jacques.lenormand@mcgill.ca
