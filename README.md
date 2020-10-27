@@ -8,5 +8,5 @@
 
 Instructions [here](https://wakata.io/webservertestcases/index.html?stream=webservices-chat)
 
-## Continuous Development
+## Continuous Deployment
 - [Heroku](heroku.com)
