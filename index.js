@@ -49,27 +49,24 @@ let findValueInMap = (map, value) => {
 
 let login = cred => {
     let validationResponse = loginValidation(cred);
-    
     console.log("login-attempt: ". cred)
-    
     if (validationResponse["success"] === true) {
         console.log("login-response: ", validationResponse);
     };
-
     return validationResponse
 };
 
 // function when there is a signup
 let newSignUp = entry => {
     let userId = genId();
-    
-    let validationResponse = newSignUpValidation(entry)
+    let validationResponse = newSignUpValidation(entry);
     if (validationResponse["success"] === true) {
         userDataBase.set(userId, entry);
         console.log("newUser: ", userId + ": " + entry);
-    }
+    };
     return validationResponse;
 };
+
 
 // validation function ---------------------------------------------------------
 

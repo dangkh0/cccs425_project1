@@ -8,11 +8,11 @@
 
 Instructions [here](https://wakata.io/webservertestcases/index.html?stream=webservices-chat)
 
-## Continuous Deployment
-- [Heroku](https://cccs425-project1.herokuapp.com)
-- [Glitch](https://nyx-frequent-holiday.glitch.me)
+## 
+- Heroku: https://cccs425-project1.herokuapp.com
+- Glitch: https://onyx-frequent-holiday.glitch.me
 
-# API
+# API Endpoints
 ## /signup
 | Response | Request |
 | --- | --- |
