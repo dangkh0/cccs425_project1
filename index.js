@@ -49,9 +49,11 @@ let findValueInMap = (map, value) => {
 
 let login = cred => {
     let validationResponse = loginValidation(cred);
-
+    
+    console.log("login-attempt: ". cred)
+    
     if (validationResponse["success"] === true) {
-        console.log("login: ". cred)
+        console.log("login-response: ", validationResponse);
     };
 
     return validationResponse
@@ -72,17 +74,33 @@ let newSignUp = entry => {
 // validation function ---------------------------------------------------------
 
 let loginValidation = cred => {
+    let userIds = Array.from(userDataBase.keys())
+
     // valiadate if username field is missing
     if (cred['username'] === undefined) {
         return LOGIN_REPONSES['missingNameField'];
     }
     // valiadate if password field is missing
-    if (cred['username'] === undefined) {
+    if (cred['password'] === undefined) {
         return LOGIN_REPONSES['missingPasswordField'];
     }
     // valildate if username exist
-        // validate password if username exist 
-    
+    for (let i = 0; i < userIds.length; i++) {
+        let id = userIds[i];
+        let password = userDataBase.get(id)["password"];
+        let username = userDataBase.get(id)["username"];
+
+        if (cred["username"] === username) {
+            // validate password if username exist 
+            if (cred["password"] === password) {
+                return LOGIN_REPONSES['good'];
+            } else {
+                return LOGIN_REPONSES['invalidPassword']
+            };
+        } else {
+            return LOGIN_REPONSES['userNotExist']
+        };
+    };
 };
 
 let newSignUpValidation = entry => {
@@ -123,14 +141,13 @@ app.post("/signup", (req, res) => {
 
 app.post("/login", (req, res) => {
     let parsed = JSON.parse(req.body);
-
+    debugger
     console.log("body: ", req.body);
     console.log("body: ", parsed);
 
-    cred = {username: parsed.username, password: parsed.password};
-    login(cred)
-
-
+    let cred = {username: parsed.username, password: parsed.password};
+    
+    res.send(login(cred));
 });
 
 app.get("/sourcecode", (req, res) => {
