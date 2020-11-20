@@ -81,14 +81,14 @@ let loginValidation = cred => {
     if (cred['password'] === undefined) {
         return LOGIN_REPONSES['missingPasswordField'];
     }
-    // valildate if username exist
+    // valildate if username exist in userDataBase
     for (let i = 0; i < userIds.length; i++) {
         let id = userIds[i];
         let password = userDataBase.get(id)["password"];
         let username = userDataBase.get(id)["username"];
 
         if (cred["username"] === username) {
-            // validate password if username exist 
+            // validate if password exist in userDataBase
             if (cred["password"] === password) {
                 return LOGIN_REPONSES['good'];
             } else {
