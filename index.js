@@ -35,7 +35,7 @@ const LOGIN_REPONSES = {
     missingPasswordField: {"success":false,"reason":"password field missing"},
 };
 
-// functions and methods========================================================
+// functions and methods =======================================================
 
 // search map by value
 let findValueInMap = (map, value) => {
@@ -68,7 +68,7 @@ let newSignUp = entry => {
 };
 
 
-// validation function ---------------------------------------------------------
+// validation functions --------------------------------------------------------
 
 let loginValidation = cred => {
     let userIds = Array.from(userDataBase.keys())
@@ -136,6 +136,7 @@ app.post("/signup", (req, res) => {
     res.send(newSignUp(entry));
 });
 
+// POST ------------------------------------------------------------------------
 app.post("/login", (req, res) => {
     let parsed = JSON.parse(req.body);
     debugger
@@ -150,6 +151,8 @@ app.post("/login", (req, res) => {
 app.get("/sourcecode", (req, res) => {
   res.send(require('fs').readFileSync(__filename).toString())
 });
+
+// other -----------------------------------------------------------------------
 
 //TODO: i dont know what this does
 app.listen(process.env.PORT || 3000)
