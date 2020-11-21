@@ -29,3 +29,6 @@ Instructions [here](https://wakata.io/webservertestcases/index.html?stream=webse
 | {"success":false,"reason":"Invalid password"} | `curl -X POST -d '{"username": "stringer_bell", "password": "quen"}' https://onyx-frequent-holiday.glitch.me/login` |
 | {"success":false,"reason":"password field missing"} | `curl -X POST -d '{ "username": "queen"}' https://onyx-frequent-holiday.glitch.me/login`|
 | {"success":false,"reason":"username field missing"} | `curl -X POST -d '{ "password": "queen"}' https://onyx-frequent-holiday.glitch.me/login` |
+
+## /create-channel
+

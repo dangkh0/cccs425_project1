@@ -1,6 +1,7 @@
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const express = require('express');
+const { token } = require('morgan');
 const morgan = require('morgan');
 
 const app = express();
@@ -11,7 +12,8 @@ app.use(morgan('combined'));
 
 let userDataBase = new Map(); //userId: {username:xyz, password:xyz}
 
-userDataBase.set('xyz', {'username': 'stringer_bell', 'password': 'queen'});
+userDataBase.set('xyz', {username: "stringer_bell", password: "queen"});
+userDataBase.set('zyx', {username: "mcnulty", password: "iLoveAlcohol"});
 
 // generate random id
 let genId = () => {
@@ -49,7 +51,7 @@ let findValueInMap = (map, value) => {
 
 let login = cred => {
     let validationResponse = loginValidation(cred);
-    console.log("login-attempt: ". cred)
+    console.log("login-attempt: ", cred)
     if (validationResponse["success"] === true) {
         console.log("login-response: ", validationResponse);
     };
@@ -71,7 +73,7 @@ let newSignUp = entry => {
 // validation functions --------------------------------------------------------
 
 let loginValidation = cred => {
-    let userIds = Array.from(userDataBase.keys())
+    let userIds = Array.from(userDataBase.keys());
 
     // valiadate if username field is missing
     if (cred['username'] === undefined) {
@@ -86,18 +88,18 @@ let loginValidation = cred => {
         let id = userIds[i];
         let password = userDataBase.get(id)["password"];
         let username = userDataBase.get(id)["username"];
-
-        if (cred["username"] === username) {
-            // validate if password exist in userDataBase
-            if (cred["password"] === password) {
+        
+        if (cred['username'] === username) {
+            if (cred['password'] === password) {
+                let token  = genId();
+                LOGIN_REPONSES['good']['token'] = token;
                 return LOGIN_REPONSES['good'];
             } else {
-                return LOGIN_REPONSES['invalidPassword']
+                return LOGIN_REPONSES['invalidPassword'];
             };
-        } else {
-            return LOGIN_REPONSES['userNotExist']
         };
     };
+    return LOGIN_REPONSES['userNotExist'];
 };
 
 let newSignUpValidation = entry => {
@@ -124,6 +126,7 @@ app.get('/', (req, res) => {
     res.send('Hello World!')
 });
 
+// POST ------------------------------------------------------------------------
 app.post("/signup", (req, res) => {
     let entry = undefined
     let parsed = JSON.parse(req.body);
@@ -131,19 +134,19 @@ app.post("/signup", (req, res) => {
     console.log('body: ', req.body);
     console.log('body: ', parsed);
 
-    entry = {username: parsed.username, password: parsed.password};
+    entry = {username: parsed.username.toLowerCase(), password: parsed.password};
 
     res.send(newSignUp(entry));
 });
 
-// POST ------------------------------------------------------------------------
 app.post("/login", (req, res) => {
+    let cred  = undefined;
     let parsed = JSON.parse(req.body);
     debugger
     console.log("body: ", req.body);
     console.log("body: ", parsed);
 
-    let cred = {username: parsed.username, password: parsed.password};
+    cred = {username: parsed.username.toLowerCase(), password: parsed.password};
     
     res.send(login(cred));
 });
