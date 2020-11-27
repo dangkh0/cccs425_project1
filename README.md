@@ -43,12 +43,12 @@ instructions [here](https://wakata.io/webservertestcases/index.html?stream=webse
 | response | request |
 | --- | --- |
 | {"success":true} |  |
-| {\"success\":false,\"reason\":\"token field missing\"} | curl -XPOST -d '{"channelName": "thebooth"}' "$url/join-channel" |
-| {\"success\":false,\"reason\":\"Invalid token\"} | curl -XPOST -H 'token: this_is_the_token_0' -d '{"channelName": "thebooth"}' "$url/join-channel" |
-| {\"success\":false,\"reason\":\"channelName field missing\"} | curl -XPOST -H 'token: this_is_the_token_3' -d '{}' "$url/join-channel" |
-| {\"success\":false,\"reason\":\"Channel does not exist\"}$ | curl -XPOST -H 'token: this_is_the_token_3' -d '{"channelName": "thecell"}' "$url/join-channel" |
-| {\"success\":false,\"reason\":\"User has already joined\"} | curl -XPOST -H 'token: this_is_the_token' -d '{"channelName": "thewire"}' "$url/join-channel" |
-| {\"success\":false,\"reason\":\"User is banned\"} | curl -XPOST -H 'token: this_is_the_token_2' -d '{"channelName": "thewire"}' "$url/join-channel" |
+| {"success":false,"reason":"token field missing"} | curl -XPOST -d '{"channelName": "thebooth"}' "https://onyx-frequent-holiday.glitch.me/join-channel" |
+| {"success":false,"reason":"Invalid token"} | curl -XPOST -H 'token: this_is_the_token_0' -d '{"channelName": "thebooth"}' "https://onyx-frequent-holiday.glitch.me/join-channel" |
+| {"success":false,"reason":"channelName field missing"} | curl -XPOST -H 'token: this_is_the_token_3' -d '{}' "https://onyx-frequent-holiday.glitch.me/join-channel" |
+| {"success":false,"reason":"Channel does not exist"}$ | curl -XPOST -H 'token: this_is_the_token_3' -d '{"channelName": "thecell"}' "https://onyx-frequent-holiday.glitch.me/join-channel" |
+| {"success":false,"reason":"User has already joined"} | curl -XPOST -H 'token: this_is_the_token' -d '{"channelName": "thewire"}' "https://onyx-frequent-holiday.glitch.me/join-channel" |
+| {"success":false,"reason":"User is banned"} | curl -XPOST -H 'token: this_is_the_token_2' -d '{"channelName": "thewire"}' "https://onyx-frequent-holiday.glitch.me/join-channel" |
 ---
 # maps
 ## channelTable

@@ -28,14 +28,18 @@ channelTable.set("channel-id", {token: "this_is_the_token", channelName: "thewir
 channelTable.set("channel-id_2", {token: "this_is_the_token_2", channelName: "thebooth", memberList: ["xyz"], banList: ["zyx"]});
 // TEST DATA ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-// generate random id
-
-
 // responses ===================================================================
 const CREATE_CHANNEL_RES = {
     good: {"success":true},
     notUniqueChannel: {"success":false,"reason":"Channel already exists"},
     missingChannelNameField : {"success":false,"reason":"channelName field missing"},
+}
+
+const DELETE_RES = {
+    good: {"success": true},
+    channelNotExist: {"success":false,"reason":"Channel does not exist"},
+    missingChannelNameField: {"success":false,"reason":"channelName field missing"},
+    notCreator: {"success":false,"reason":"you cannot do that"},
 }
 
 const GLOBAL_RES = {
@@ -45,18 +49,23 @@ const GLOBAL_RES = {
 
 const JOIN_CHANNEL_RES = {
     good: {"success":true},
-    missingPasswordField: {"success":false,"reason":"Invalid token"},
     missingChannelNameField: {"success":false,"reason":"channelName field missing"},
     channelNotExist: {"success":false,"reason":"Channel does not exist"},
-    alreadyJoined: {"success":false,"reason":"User has already joined"},
+    existingMember: {"success":false,"reason":"User has already joined"},
     banned: {"success":false,"reason":"User is banned"},
 }
 
-const SIGNUP_RES = {
-    good: {"success":true},
-    notUnique: {"success":false,"reason":"Username exists"},
-    missingNameField: {"success":false,"reason":"username field missing"},
-    missingPasswordField: {"success":false,"reason":"password field missing"},
+const JOINED_RES = {
+    good: {"success":true,"joined":undefined},
+    channelNotExist: {"success":false,"reason":"Channel does not exist"},
+    notMember: {"success":false,"reason":"User is not part of this channel"},
+};
+
+const LEAVE_CHANNEL_RES = {
+    good: {"success": true},
+    missingChannelNameField: {"success":false,"reason":"channelName field missing"},
+    channelNotExist: {"success":false,"reason":"Channel does not exist"},
+    notMember: {"success":false,"reason":"User is not part of this channel"},
 };
 
 const LOGIN_RES = {
@@ -67,11 +76,23 @@ const LOGIN_RES = {
     userNotExist: {"success":false,"reason":"User does not exist"},
 };
 
+const SIGNUP_RES = {
+    good: {"success":true},
+    notUnique: {"success":false,"reason":"Username exists"},
+    missingNameField: {"success":false,"reason":"username field missing"},
+    missingPasswordField: {"success":false,"reason":"password field missing"},
+};
+
 // functions and methods =======================================================
 
-// [C]reate channel request function
+// [B]an channel request handler function
+let ban = (token, reqJSON) => {
+
+};
+
+// [C]reate channel request handler function
 let createChannel = (token, reqJSON) => {
-    let channelName = reqJSON["channelName"]
+    let channelName = reqJSON["channelName"];
     let resValidation = createChannelValidation(token, channelName);
     if (resValidation["success"] === true) {
         let value = {
@@ -85,6 +106,21 @@ let createChannel = (token, reqJSON) => {
     };
     console.log("/create-channel response: ", resValidation);
     return resValidation
+};
+
+// [D]elete Channel request handler function
+let deleteChannel = (token, reqJSON) => {
+    let channelName = reqJSON["channelName"];
+    let resValidation = deleteChannelValidation(token, channelName);
+    
+    if (resValidation["success"]) {
+        //delete channel
+        let channelId = getMapKeyByValue(channelTable, channelName, "channelName");
+        channelTable.delete(channelId);
+        console.log("You deleted: ", channelName);
+    };
+    console.log("/delete response: ", resValidation);
+    return resValidation;
 };
 
 // [G]et map element by value
@@ -104,7 +140,7 @@ let genId = () => {
     return "" + Math.floor(Math.random() * 1000000000);
 };
 
-// [J]oin channel] request function
+// [J]oin channel request handler function
 let joinChannel = (token, reqJSON) => {
     let channelName = reqJSON["channelName"];
     let resValidation = joinChannelValidation(token, channelName);
@@ -113,26 +149,84 @@ let joinChannel = (token, reqJSON) => {
         let channelId =  getMapKeyByValue(channelTable, channelName, "channelName");
         let userId = tokenTable.get(token)["userId"];
 
-        console.log("MEMBER LIST: ", channelTable.get(channelId)["memberList"]);
         channelTable.get(channelId)["memberList"].push(userId);
-        console.log("welcome to the channel: ", channelTable);
+        console.log("welcome to the channel: ", userId);
     };
     console.log("/join-channel response: ", resValidation );
     return resValidation
+};
+
+// [J]oined request handler function
+let joined = (token, channelName) => {
+    let channelId = getMapKeyByValue (channelTable, channelName, "channelName");
+    let resValidation = joinedValidation(token, channelName);
+
+    console.log("/joined response: ", resValidation );
+    return resValidation;
+};
+
+let kick = (token, reqJSON) => {
+
 }
 
-// [L]ogin request function
+// [L]eave cahnnel request handler function
+let leaveChannel = (token, reqJSON) => {
+    let channelName = reqJSON["channelName"];
+    let resValidation = leaveChannelValidation(token, channelName);
+
+    if (resValidation["success"]) {
+        let channelId =  getMapKeyByValue(channelTable, channelName, "channelName");
+        let userId = tokenTable.get(token)["userId"];
+
+        let memberList = channelTable.get(channelId)["memberList"]
+        console.log("MEMBER LIST: ", memberList);
+
+        for (let i = 0; i < memberList.length; i++) {
+            let memberId = memberList[i];
+            console.log("memberId: ", memberId);
+            console.log("userId: ", userId);
+            if (memberId === userId) {
+                memberList.splice(i, 1);
+                console.log("MEMBER LIST: ", memberList );
+            };
+        };
+    };
+    console.log("/leave-channel response: ", resValidation );
+    return resValidation
+};
+
+// [Message] request handler function
+let message = (token, reqJSON) => {
+
+}
+
+// [Message]s request handler function
+let messages = (token, reqJSON) => {
+
+};
+
+// [L]ogin request handler function
 let login = (cred) => {
     let resValidation = loginValidation(cred);
     console.log("login-attempt: ", cred)
     if (resValidation["success"] === true) {
         console.log("welcome back: ", cred["username"]);
     };
-    console.log("login: ", resValidation);
+    console.log("/login response: ", resValidation);
     return resValidation
 };
 
-// [S]ign up request function
+let memberNameList = (memberList)=> {
+    let memberNameList = [];
+    for (let i = 0; i < memberList.length; i++) {
+        memberId = memberList[i];
+        memberName = userTable.get(memberId)["username"];
+        memberNameList.push(memberName);
+    };
+    return memberNameList;
+};
+
+// [S]ign up request handler function
 let signUp = (entry) => {
     let userId = genId();
     let resValidation = signUpValidation(entry);
@@ -140,6 +234,7 @@ let signUp = (entry) => {
         userTable.set(userId, entry);
         console.log("newUser: ", userId + ": " + entry);
     };
+    console.log("/signUp response: ", resValidation);
     return resValidation;
 };
 
@@ -148,70 +243,142 @@ let signUp = (entry) => {
 
 // [C]reate-channel endpoint validation function
 let createChannelValidation = (token, channelName) => {
-    // validate if token is missing
-    if (token === undefined) {
-        return GLOBAL_RES["missingTokenField"];
+    // validate token requirements
+    if (tokenValidations(token) !== undefined) {
+        return tokenValidations(token);
     };
     // validate if channel name field is missing
     if (channelName === undefined) {
         return CREATE_CHANNEL_RES["missingChannelNameField"];
     };
-    // validate if token is valid
-    if (tokenValidation(token)) {
     // validate if channel name is unique
-        if (getMapKeyByValue(channelTable, channelName, "channelName") !== undefined) {
-            return CREATE_CHANNEL_RES["notUniqueChannel"]
-        };
-        return CREATE_CHANNEL_RES["good"]
-    }else {
-        return GLOBAL_RES["invalidToken"]
+    if (getMapKeyByValue(channelTable, channelName, "channelName") !== undefined) {
+        return CREATE_CHANNEL_RES["notUniqueChannel"];
     };
+    return CREATE_CHANNEL_RES["good"];
 };
 
-// [J]oin-channel endpoint validation function
+// [D]elete endpoint validation function
+let deleteChannelValidation = (token, channelName) => {
+    // validate token requirements
+    console.log("TOKENTABLE: ", tokenTable);
+    if (tokenValidations(token) !== undefined) {
+        return tokenValidations(token);
+    };
+    // validate if channel name field is missing
+    if (channelName === undefined) {
+        return DELETE_RES["missingChannelNameField"];
+    };
+    let channelId = getMapKeyByValue(channelTable, channelName, "channelName");
+    // validate if channel does not exist
+    if (channelId === undefined) {
+        return DELETE_RES["channelNotExist"];
+    };
+    console.log("DELETEEE: ", token)
+    console.log("DELETEEE: ", channelTable.get(channelId)["token"])
+    // validate if is not channel creator
+    if (channelTable.get(channelId)["token"] !== token) {
+        return DELETE_RES["notCreator"];
+    }
+    //
+    return DELETE_RES["good"];
+};  
+
+// [Join]-channel endpoint validation function
 let joinChannelValidation = (token, channelName) => {
-    // validate if token is missing
-    if (token === undefined) {
-        return GLOBAL_RES["missingTokenField"];
+    // validate token requirements
+    if (tokenValidations(token) !== undefined) {
+        return tokenValidations(token);
     };
     // validate if channel name field is missing
     if (channelName === undefined) {
         return JOIN_CHANNEL_RES["missingChannelNameField"];
     };
-    // validate if token is valid
-    if(tokenValidation(token)) {
-        let channelId =  getMapKeyByValue(channelTable, channelName, "channelName");
-        let userId = tokenTable.get(token)["userId"];
 
-        // validate if channel exist
-        if (getMapKeyByValue(channelTable, channelName, "channelName") === undefined) {
-            return JOIN_CHANNEL_RES["channelNotExist"];
-        };
-        let memberList = channelTable.get(channelId)["memberList"]
-        // validate if user is already in channel
-        for (let i = 0; i < memberList.length; i++) {
-            let memberId = memberList[i];
-            console.log("memberId: ", memberId)
-            console.log("userId: ", userId)
-            if  (userId === memberId) {
-                return JOIN_CHANNEL_RES["alreadyJoined"];
-            };
-        } ;
+    let channelId =  getMapKeyByValue(channelTable, channelName, "channelName");
+    let userId = tokenTable.get(token)["userId"];
 
-        let banList = channelTable.get(channelId)["banList"]
-        // validate if user is banned from a channel
-        for (let i = 0; i < banList.length; i++) {
-            let memberId = banList[i];
-            if  (userId === memberId) {
-                return JOIN_CHANNEL_RES["banned"];
-            };
+    // validate if channel exist
+    if (getMapKeyByValue(channelTable, channelName, "channelName") === undefined) {
+        return JOIN_CHANNEL_RES["channelNotExist"];
+    };
+    let memberList = channelTable.get(channelId)["memberList"]
+    // validate if user is already in channel
+    for (let i = 0; i < memberList.length; i++) {
+        let memberId = memberList[i];
+        if  (userId === memberId) {
+            return JOIN_CHANNEL_RES["existingMember"];
         };
-        
-        return CREATE_CHANNEL_RES["good"];
-    } else {
-        return GLOBAL_RES["invalidToken"];
+    } ;
+
+    let banList = channelTable.get(channelId)["banList"]
+    // validate if user is banned from a channel
+    for (let i = 0; i < banList.length; i++) {
+        let memberId = banList[i];
+        if  (userId === memberId) {
+            return JOIN_CHANNEL_RES["banned"];
+        };
+    };
+    
+    return JOIN_CHANNEL_RES["good"];
+};
+
+// [Join]ed endpoint validation fuction
+let joinedValidation = (token, channelName) => {
+    let channelId = getMapKeyByValue(channelTable, channelName, "channelName");
+
+    console.log("Channel ID: ", channelTable.get(channelId));
+
+    if (tokenValidations(token) !== undefined) {
+        return tokenValidations(token)
+    }
+
+    let userId = tokenTable.get(token)["userId"];
+    console.log("User ID: ", userId);
+    // validate if channel exist
+    if (channelId === undefined) {
+        return JOINED_RES["channelNotExist"];
+    };
+    // validate if user is in channel
+    let memberList = channelTable.get(channelId)["memberList"]
+    for (let i = 0; i < memberList.length; i++) {
+        let memberId = memberList[i];
+        if  (userId === memberId) {
+            let memberNameLst = memberNameList(memberList);
+            JOINED_RES["good"]["joined"] = memberNameLst;
+            return JOINED_RES["good"];
+        };
+    };
+    return JOINED_RES["notMember"];
+};
+
+// [L]eave-channel endpoint validation function
+let leaveChannelValidation = (token, channelName) => {
+    // validate token requirements
+    if (tokenValidations(token) !== undefined) {
+        return tokenValidations(token);
+    };
+    // validate if channel name field is missing
+    if (channelName === undefined) {
+        return LEAVE_CHANNEL_RES["missingChannelNameField"];
     };
 
+    let channelId =  getMapKeyByValue(channelTable, channelName, "channelName");
+    let userId = tokenTable.get(token)["userId"];
+
+    // validate if channel exist
+    if (getMapKeyByValue(channelTable, channelName, "channelName") === undefined) {
+        return LEAVE_CHANNEL_RES["channelNotExist"];
+    };
+    let memberList = channelTable.get(channelId)["memberList"]
+    // validate if user is in channel
+    for (let i = 0; i < memberList.length; i++) {
+        let memberId = memberList[i];
+        if  (userId === memberId) {
+            return LEAVE_CHANNEL_RES["good"];
+        };
+    };
+    return LEAVE_CHANNEL_RES["notMember"]
 };
 
 // [L]ogin endpoint validation function
@@ -237,7 +404,6 @@ let loginValidation = cred => {
                 let token  = genId();
                 tokenTable.set(token, {userId: id});
                 LOGIN_RES['good']['token'] = token;
-                console.log("Login Response: ", LOGIN_RES["good"]);
                 return LOGIN_RES['good'];
             } else {
                 return LOGIN_RES['invalidPassword'];
@@ -262,15 +428,21 @@ let signUpValidation = entry => {
         return SIGNUP_RES['notUnique'];
     };
 
-    console.log("userTable: ", userTable);
-    console.log("entry: ", entry); 
     return SIGNUP_RES['good'];
-}
+};
 
 // [T]oken validation function
-let tokenValidation = token => {
-    return tokenTable.get(token) !== undefined
-}
+let tokenValidations = token => {
+    if (token === undefined) {
+        return GLOBAL_RES["missingTokenField"];
+    };
+
+    if (tokenTable.get(token) === undefined) {
+        return GLOBAL_RES["invalidToken"]
+    };
+
+    return undefined;
+};
 
 // api stuff====================================================================
 
@@ -279,11 +451,39 @@ app.get('/', (req, res) => {
     res.send('Hello World!')
 });
 
+app.get('/joined', (req, res) => {
+    let channelName = req.query.channelName;
+    let token = req.headers["token"];
+
+    console.log("/joined: ", channelName);
+    res.send(joined(token, channelName));
+})
+
+app.get("messages", (req, res) => {
+    let channelName = req.query.channelName;
+    let token = req.headers["token"];
+    
+    console.log("/messages: ", channelName);
+    res.send(messages(token, channelName));
+});
+
 app.get("/sourcecode", (req, res) => {
     res.send(require('fs').readFileSync(__filename).toString())
 });
 
 // POST ------------------------------------------------------------------------
+app.post("/ban", (req, res) => {
+    let body = JSON.parse(req.body);
+    let token = req.headers["token"];
+    let reqJSON = undefined;
+
+    console.log("/ban: ", body);
+
+    reqJSON = {channelName: body.channelName, target: body.target}
+
+    res.send(ban(token, reqJSON));
+});
+
 app.post("/create-channel", (req, res) => {
     let body = JSON.parse(req.body);
     let token = req.headers["token"];
@@ -292,8 +492,20 @@ app.post("/create-channel", (req, res) => {
     console.log("/create-channel: ", body);
 
     reqJSON = {channelName: body.channelName};
-    debugger
+
     res.send(createChannel(token, reqJSON));
+});
+
+app.post("/delete", (req, res) => {
+    let body = JSON.parse(req.body);
+    let token = req.headers["token"];
+    let reqJSON = undefined;
+
+    console.log("/delete: ", body);
+
+    reqJSON = {channelName: body.channelName};
+
+    res.send(deleteChannel(token, reqJSON));
 });
 
 app.post("/join-channel", (req, res) => {
@@ -304,9 +516,33 @@ app.post("/join-channel", (req, res) => {
     console.log("/join-channel: ", body);
 
     reqJSON = {channelName: body.channelName};
-    debugger
+
     res.send(joinChannel(token, reqJSON));
 });
+
+app.post("/kick", (req, res) => {
+    let body = JSON.parse(req.body);
+    let token = req.headers["token"];
+    let reqJSON = undefined;
+
+    console.log("/kick: ", body);
+
+    reqJSON = {channelName: body.channelName, target: body.target}
+
+    res.send(kick(token, reqJSON));
+});
+
+app.post("/leave-channel", (req, res) => {
+    let body = JSON.parse(req.body);
+    let token = req.headers["token"];
+    let reqJSON = undefined;
+
+    console.log("/leave-channel: ", body);
+
+    reqJSON = {channelName: body.channelName};
+
+    res.send(leaveChannel(token, reqJSON));
+})
 
 app.post("/login", (req, res) => {
     let cred  = undefined;
@@ -317,6 +553,18 @@ app.post("/login", (req, res) => {
     cred = {username: body.username, password: body.password};
     
     res.send(login(cred));
+});
+
+app.post("/message", (req, res) => {
+    let body = JSON.parse(req.body);
+    let token = req.headers["token"];
+    let reqJSON = undefined;
+
+    console.log("/message: ", body);
+
+    reqJSON = {channelName: body.channelName, contents: body.contents}
+
+    res.send(message(token, reqJSON));
 });
 
 app.post("/signup", (req, res) => {
@@ -330,7 +578,7 @@ app.post("/signup", (req, res) => {
     res.send(signUp(entry));
 });
 
-// other -----------------------------------------------------------------------
+// others -----------------------------------------------------------------------
 
 //TODO: i dont know what this does
 app.listen(process.env.PORT || 3000)
