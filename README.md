@@ -11,7 +11,43 @@ instructions [here](https://wakata.io/webservertestcases/index.html?stream=webse
 ## 
 - heroku: https://cccs425-project1.herokuapp.com
 - glitch: https://onyx-frequent-holiday.glitch.me
+
 ---
+
+# todo
+1) finish testScript.sh
+2) finish documentation
+
+---
+
+# maps
+## channelTable
+| fields | datatype | description |
+| --- | --- | ---|
+| channelId | integer | PK, unique id |
+| token | interger | FK. token of channel owner |
+| channelName | varchar | name of the channel |
+| memberList | list | list of userIds that are in the channel |
+| banList | list | list of of userIds that are banned from the channel |
+| messages | list | list of dictionaries of message contents |
+
+
+## tokenTable
+| fields | datatype | description |
+| --- | --- | ---|
+| token | interger | PK, unique id |
+| userId | varchar | FK unique id from userTable |
+
+
+## userTable
+| fields | datatype | description |
+| --- | --- | ---|
+| userId | interger | PK, unique id |
+| username | varchar | users name |
+| password | varchar | users password |
+
+---
+
 # API endpoints
 ## /signup
 | response | request |
@@ -43,35 +79,10 @@ instructions [here](https://wakata.io/webservertestcases/index.html?stream=webse
 | response | request |
 | --- | --- |
 | {"success":true} |  |
-| {"success":false,"reason":"token field missing"} | curl -XPOST -d '{"channelName": "thebooth"}' "https://onyx-frequent-holiday.glitch.me/join-channel" |
-| {"success":false,"reason":"Invalid token"} | curl -XPOST -H 'token: this_is_the_token_0' -d '{"channelName": "thebooth"}' "https://onyx-frequent-holiday.glitch.me/join-channel" |
-| {"success":false,"reason":"channelName field missing"} | curl -XPOST -H 'token: this_is_the_token_3' -d '{}' "https://onyx-frequent-holiday.glitch.me/join-channel" |
-| {"success":false,"reason":"Channel does not exist"}$ | curl -XPOST -H 'token: this_is_the_token_3' -d '{"channelName": "thecell"}' "https://onyx-frequent-holiday.glitch.me/join-channel" |
-| {"success":false,"reason":"User has already joined"} | curl -XPOST -H 'token: this_is_the_token' -d '{"channelName": "thewire"}' "https://onyx-frequent-holiday.glitch.me/join-channel" |
-| {"success":false,"reason":"User is banned"} | curl -XPOST -H 'token: this_is_the_token_2' -d '{"channelName": "thewire"}' "https://onyx-frequent-holiday.glitch.me/join-channel" |
----
-# maps
-## channelTable
-| fields | datatype | description |
-| --- | --- | ---|
-| channelId | integer | PK, unique id |
-| token | interger | FK. token of channel owner |
-| channelName | varchar | name of the channel |
-| memberList | list | list of userIds that are in the channel |
-| banList | list | list of of userIds that are banned from the channel |
-| messages | list | list of dictionaries of message contents |
+| {"success":false,"reason":"token field missing"} | `curl -XPOST -d '{"channelName": "thebooth"}' "https://onyx-frequent-holiday.glitch.me/join-channel"` |
+| {"success":false,"reason":"Invalid token"} | `curl -XPOST -H 'token: this_is_the_token_0' -d '{"channelName": "thebooth"}' "https://onyx-frequent-holiday.glitch.me/join-channel"` |
+| {"success":false,"reason":"channelName field missing"} | `curl -XPOST -H 'token: this_is_the_token_3' -d '{}' "https://onyx-frequent-holiday.glitch.me/join-channel"` |
+| {"success":false,"reason":"Channel does not exist"}$ | `curl -XPOST -H 'token: this_is_the_token_3' -d '{"channelName": "thecell"}' "https://onyx-frequent-holiday.glitch.me/join-channel"` |
+| {"success":false,"reason":"User has already joined"} | `curl -XPOST -H 'token: this_is_the_token' -d '{"channelName": "thewire"}' "https://onyx-frequent-holiday.glitch.me/join-channel"` |
+| {"success":false,"reason":"User is banned"} | `curl -XPOST -H 'token: this_is_the_token_2' -d '{"channelName": "thewire"}' "https://onyx-frequent-holiday.glitch.me/join-channel"` |
 
-
-## tokenTable
-| fields | datatype | description |
-| --- | --- | ---|
-| token | interger | PK, unique id |
-| userId | varchar | FK unique id from userTable |
-
-
-## userTable
-| fields | datatype | description |
-| --- | --- | ---|
-| userId | interger | PK, unique id |
-| username | varchar | users name |
-| password | varchar | users password |

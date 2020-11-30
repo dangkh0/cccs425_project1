@@ -9,9 +9,9 @@ app.use(bodyParser.raw({ type: "*/*" }));
 app.use(cors());
 app.use(morgan('combined'));
 
-let channelTable = new Map(); // channelId: { channelID, token, channelName}
+let channelTable = new Map(); // channelId: {channelID, token, channelName, memberList, banList, messages}
 let tokenTable = new Map(); // token: {userId}
-let userTable = new Map(); // userId: {username,password}
+let userTable = new Map(); // userId: {username, password}
 
 let counter = 0;
 
