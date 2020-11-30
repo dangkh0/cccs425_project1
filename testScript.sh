@@ -136,6 +136,22 @@ red="\033[0;31m"
 # /kick ------------------------------------------------------------------------
 echo -e "\n\n$red/kick$clear"
 echo -e "$green{\"success\":true}$clear"
+curl -XPOST -H 'token: this_is_the_token' -d '{"channelName":"thewire","target":"prez"}' "$url/kick"
+
+# {"success":false,"reason":"token field missing"}
+curl -XPOST -d '{"channelName":"thewire","target":"prez"}' "$url/kick"
+
+# {"success":false,"reason":"Invalid token"}
+curl -XPOST -H 'token: this_is_not_the_token' -d '{"channelName":"thewire","target":"prez"}' "$url/kick"
+
+# {"success":false,"reason":"channelName field missing"}
+curl -XPOST -H 'token: this_is_the_token' -d '{"target":"prez"}' "$url/kick"
+
+# {"success":false,"reason":"target field missing"}
+curl -XPOST -H 'token: this_is_the_token' -d '{"channelName":"thewire"}' "$url/kick"
+
+# {"success":false,"reason":"Channel not owned by user"}
+curl -XPOST -H 'token: this_is_the_token_2' -d '{"channelName":"thewire","target":"prez"}' "$url/kick"
 
 # /ban -------------------------------------------------------------------------
 echo -e "\n\n$red/ban$clear"
@@ -149,5 +165,6 @@ echo -e "$green{\"success\":true}$clear"
 echo -e "\n\n$red/messages$clear"
 echo -e "$green{\"success\":true}$clear"
 curl -XPOST -H 'token: this_is_the_token' -d '{"channelName":"thewire","contents":"hi"}' "$url/message"
+
 
 echo -e "\n\n${green}Test completed${clear}"

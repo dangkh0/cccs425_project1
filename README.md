@@ -55,10 +55,11 @@ instructions [here](https://wakata.io/webservertestcases/index.html?stream=webse
 | fields | datatype | description |
 | --- | --- | ---|
 | channelId | integer | PK, unique id |
-| token | interger | FK. token of channel creator |
+| token | interger | FK. token of channel owner |
 | channelName | varchar | name of the channel |
 | memberList | list | list of userIds that are in the channel |
 | banList | list | list of of userIds that are banned from the channel |
+| messages | list | list of dictionaries of message contents |
 
 
 ## tokenTable
