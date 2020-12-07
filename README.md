@@ -17,6 +17,7 @@ instructions [here](https://wakata.io/webservertestcases/index.html?stream=webse
 # todo
 1) finish testScript.sh
 2) finish documentation
+3) include summary in readme
 
 ---
 
